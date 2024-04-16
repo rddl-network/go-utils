@@ -19,12 +19,12 @@ on:
       files:
         description: "Files"
         required: true
-        default: "rddl-2-plmnt-service"
+        default: "go-logger"
       directory:
         description: "Directory"
         required: false
         type: string
-        default: ''
+        default: "logger"
 
 jobs:
   release:
