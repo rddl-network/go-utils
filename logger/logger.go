@@ -1,4 +1,4 @@
-package service
+package logger
 
 import (
 	"fmt"
@@ -11,6 +11,13 @@ import (
 	"github.com/go-kit/log/level"
 )
 
+const (
+	DEBUG = "debug"
+	INFO  = "info"
+	WARN  = "warn"
+	ERROR = "error"
+)
+
 type AppLogger struct {
 	logger log.Logger
 }
@@ -21,17 +28,17 @@ func GetLogger(logLevel string) AppLogger {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
 
 	// logLevel should be set to "debug", "info", "warn", or "error"
-	if !slices.Contains([]string{"debug", "info", "warn", "error"}, logLevel) {
+	if !slices.Contains([]string{DEBUG, INFO, WARN, ERROR}, logLevel) {
 		stdLog.Panicln("logLevel should be set to debug, info, warn or error")
 	}
 
 	// Set log level
 	switch logLevel {
-	case "debug":
+	case DEBUG:
 		logger = level.NewFilter(logger, level.AllowDebug())
-	case "info":
+	case INFO:
 		logger = level.NewFilter(logger, level.AllowInfo())
-	case "warn":
+	case WARN:
 		logger = level.NewFilter(logger, level.AllowWarn())
 	default:
 		logger = level.NewFilter(logger, level.AllowError())
