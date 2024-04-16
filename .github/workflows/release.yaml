@@ -22,4 +22,5 @@ jobs:
     uses: rddl-network/github-actions/.github/workflows/release-module.yaml@main
     with:
       tag: ${{ github.event.inputs.tag }}
-      prerelease: ${{ github.event.input.prerelease }}
+      prerelease: ${{ github.event.inputs.prerelease }}
+      generate_release_notes: true
