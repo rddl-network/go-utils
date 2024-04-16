@@ -23,4 +23,3 @@ jobs:
     with:
       tag: ${{ github.event.inputs.tag }}
       prerelease: ${{ github.event.inputs.prerelease }}
-      generate_release_notes: true
