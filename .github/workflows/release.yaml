@@ -16,21 +16,10 @@ on:
           - true
           - false
         default: true
-      files:
-        description: "Files"
-        required: true
-        default: "go-logger"
-      directory:
-        description: "Directory"
-        required: false
-        type: string
-        default: "logger"
 
 jobs:
   release:
-    uses: rddl-network/github-actions/.github/workflows/release.yaml@main
+    uses: rddl-network/github-actions/.github/workflows/release-module.yaml@main
     with:
       tag: ${{ github.event.inputs.tag }}
       prerelease: ${{ fromJSON(github.event.inputs.prerelease) }}
-      files: ${{ github.event.inputs.files }}
-      directory: ${{ github.event.inputs.directory }}
