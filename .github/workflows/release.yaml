@@ -22,4 +22,4 @@ jobs:
     uses: rddl-network/github-actions/.github/workflows/release-module.yaml@main
     with:
       tag: ${{ github.event.inputs.tag }}
-      prerelease: ${{ fromJSON(github.event.inputs.prerelease) }}
+      prerelease: ${{ github.event.input.prerelease }}
