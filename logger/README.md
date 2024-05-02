@@ -1,5 +1,5 @@
-# go-logger
-The go-logger package serve a centralized module for structured logging.
+# logger
+The logger package serve a centralized module for structured logging.
 
 ## Log levels
 The following log levels are supported sorted from most to least logging `debug`, `info`, `warn`, `error`.
@@ -11,7 +11,7 @@ This package uses key-value pairs to create logs. Any logging with an uneven amo
 package main
 
 import (
-    log "github.com/rddl-network/go-logger/logger"
+    log "github.com/rddl-network/go-utils/logger"
 )
 
 func main() {
