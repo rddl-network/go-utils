@@ -1,4 +1,4 @@
-module github.com/rddl-network/go-logger
+module github.com/rddl-network/go-utils
 
 go 1.21.5
 
