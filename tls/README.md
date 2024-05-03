@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-        _, err := tls.Get2WayTLSClient("./ca.crt", "./client.crt", "./client.key")
+        _, err := tls.Get2WayTLSClient("./certs/")
         if err != nil {
                 log.Fatalln(err)
         }

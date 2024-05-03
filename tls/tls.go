@@ -9,9 +9,9 @@ import (
 )
 
 // Get2WayTLSClient creates a Go HTTP client for TLS web client authentication.
-func Get2WayTLSClient(caCertPath, clientCertPath, clientKeyPath string) (client *http.Client, err error) {
+func Get2WayTLSClient(certsPath string) (client *http.Client, err error) {
 	// Load CA cert
-	caCert, err := os.ReadFile(caCertPath)
+	caCert, err := os.ReadFile(certsPath + "ca.crt")
 	if err != nil {
 		fmt.Printf("Error loading CA certificate: %v\n", err)
 		return
@@ -20,7 +20,7 @@ func Get2WayTLSClient(caCertPath, clientCertPath, clientKeyPath string) (client 
 	caCertPool.AppendCertsFromPEM(caCert)
 
 	// Load client key pair
-	cert, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
+	cert, err := tls.LoadX509KeyPair(certsPath+"client.crt", certsPath+"client.key")
 	if err != nil {
 		fmt.Printf("Error loading client certificate: %v\n", err)
 		return
