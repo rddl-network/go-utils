@@ -13,11 +13,11 @@ func TestValidateSignature(t *testing.T) {
 	privKey := secp256k1.GenPrivKey()
 	pubKey := privKey.PubKey()
 
-	msg := "msg"
-	sign, err := privKey.Sign([]byte(msg))
+	msg := []byte("msg")
+	sign, err := privKey.Sign(msg)
 	assert.NoError(t, err)
 
-	hexMsg := hex.EncodeToString([]byte(msg))
+	hexMsg := hex.EncodeToString(msg)
 	hexSign := hex.EncodeToString(sign)
 	hexPublicKey := hex.EncodeToString(pubKey.Bytes())
 
