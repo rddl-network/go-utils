@@ -14,7 +14,7 @@ import (
 
 func main() {
     privKey := secp256k1.GenPrivKey()
-	pubKey := privKey.PubKey()
+    pubKey := privKey.PubKey()
     
     msg := "msg"
     sign, err := privKey.Sign([]byte(msg))
@@ -23,8 +23,8 @@ func main() {
     }
 
     hexMsg := hex.EncodeToString([]byte(msg))
-	hexSign := hex.EncodeToString(sign)
-	hexPublicKey := hex.EncodeToString(pubKey.Bytes())
+    hexSign := hex.EncodeToString(sign)
+    hexPublicKey := hex.EncodeToString(pubKey.Bytes())
     
     isValid, err := signature.ValidateSignature(hexMsg, hexSign, hexPublicKey)
     if err != nil {
