@@ -8,6 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestGetRandomPrivateKey(t *testing.T) {
+	// valid
+	pkSource, err := pki.GetRandomPrivateKey()
+	assert.NoError(t, err)
+	// should be 32 bytes (2 hex characters per byte) for secp256 curve
+	assert.Equal(t, 64, len(pkSource))
+}
+
 func TestGenerateNewKeyPair(t *testing.T) {
 	// valid
 	pkSource := "b94fa8c5095409dbb313351d39328dbbee9414b43763c79c2177e81d5c2c0672"
