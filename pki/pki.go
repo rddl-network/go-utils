@@ -9,7 +9,10 @@ import (
 	hexutil "github.com/rddl-network/go-utils/hex"
 )
 
-func GetRandomPrivateKey(n int) (string, error) {
+// should be 32 bytes for secp256 curve
+var n = 32
+
+func GetRandomPrivateKey() (string, error) {
 	return hexutil.RandomHex(n)
 }
 
