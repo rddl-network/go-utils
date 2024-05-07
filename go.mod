@@ -3,18 +3,18 @@ module github.com/rddl-network/go-utils
 go 1.21.5
 
 require (
+	github.com/btcsuite/btcd/btcec/v2 v2.3.2
 	github.com/cosmos/cosmos-sdk v0.47.5
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0
 	github.com/go-kit/log v0.2.1
 	github.com/stretchr/testify v1.8.4
 )
 
 require (
 	cosmossdk.io/errors v1.0.0 // indirect
-	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/cometbft/cometbft v0.37.2 // indirect
 	github.com/cosmos/gogoproto v1.4.10 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
