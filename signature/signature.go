@@ -28,6 +28,8 @@ func ValidateSignature(hexMessage string, hexSignature string, hexPublicKey stri
 	return isValid, nil
 }
 
+// ValidateSECP256R1Signature takes the hex-encoded message together with r, s of the signature (combined as []byte{r.Bytes()..., s.Bytes()...})
+// and x, y (combined as []byte{0x04, x.Bytes()..., y.Bytes()...}) of the public key
 func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
 	messageBytes, signatureBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
 	if err != nil {
