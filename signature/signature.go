@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
+	"encoding/asn1"
 	"encoding/hex"
 	"errors"
 	"math/big"
@@ -31,7 +32,7 @@ func ValidateSignature(hexMessage string, hexSignature string, hexPublicKey stri
 // ValidateSECP256R1Signature takes the hex-encoded message together with r, s of the signature (combined as []byte{r.Bytes()..., s.Bytes()...})
 // and x, y (combined as []byte{0x04, x.Bytes()..., y.Bytes()...}) of the public key
 func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
-	messageBytes, signatureBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
+	_, signatureBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
 	if err != nil {
 		return false, err
 	}
@@ -44,7 +45,7 @@ func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPubli
 	rBytes, sBytes := signatureBytes[:len(signatureBytes)/2], signatureBytes[len(signatureBytes)/2:]
 	r, s := new(big.Int).SetBytes(rBytes), new(big.Int).SetBytes(sBytes)
 
-	hash := sha256.Sum256(messageBytes)
+	hash := sha256.Sum256([]byte(hexMessage))
 	isValid := ecdsa.Verify(pubKey, hash[:], r, s)
 	if !isValid {
 		return false, errors.New("invalid signature")
@@ -53,13 +54,15 @@ func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPubli
 }
 
 func UncompressedBytesToPublicKey(b []byte) (*ecdsa.PublicKey, error) {
-	if b[0] != 0x04 {
-		return nil, errors.New("expected uncompressed point")
+	offset := 1
+	if b[0] != 0x04 && len(b) == 64 {
+		//return nil, errors.New("expected uncompressed point")
+		offset = 0
 	}
 
 	curve := elliptic.P256()
-	x := new(big.Int).SetBytes(b[1 : 1+curve.Params().BitSize/8])
-	y := new(big.Int).SetBytes(b[1+curve.Params().BitSize/8:])
+	x := new(big.Int).SetBytes(b[offset : offset+curve.Params().BitSize/8])
+	y := new(big.Int).SetBytes(b[offset+curve.Params().BitSize/8:])
 
 	return &ecdsa.PublicKey{
 		Curve: curve,
@@ -100,4 +103,34 @@ func decodeInputs(hexMessage string, hexSignature string, hexPublicKey string) (
 		return nil, nil, nil, errors.New("invalid public key hex string")
 	}
 	return
+}
+
+func ValidateSECP256R1SignatureNew(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
+	_, sigBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
+	if err != nil {
+		return false, err
+	}
+
+	pubKey, err := UncompressedBytesToPublicKey(publicKeyBytes)
+	if err != nil {
+		return false, err
+	}
+
+	type ECDSASignature struct {
+		R, S *big.Int
+	}
+
+	// Assuming asn1Data contains an ECDSA signature in DER format
+	var signature ECDSASignature
+	_, err = asn1.Unmarshal(sigBytes, &signature)
+	if err != nil {
+		return false, errors.New("unable to unmarshal signature")
+	}
+
+	hash := sha256.Sum256([]byte(hexMessage))
+	isValid := ecdsa.Verify(pubKey, hash[:], signature.R, signature.S)
+	if !isValid {
+		return false, errors.New("invalid signature")
+	}
+	return isValid, nil
 }
