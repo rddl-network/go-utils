@@ -64,7 +64,6 @@ func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPubli
 func UncompressedBytesToPublicKey(b []byte) (*ecdsa.PublicKey, error) {
 	offset := 1
 	if b[0] != 0x04 && len(b) == 64 {
-		//return nil, errors.New("expected uncompressed point")
 		offset = 0
 	}
 
