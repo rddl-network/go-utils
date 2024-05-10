@@ -107,7 +107,7 @@ func TestHashingOfPubKey(t *testing.T) {
 	assert.NoError(t, err)
 	digest := []byte(refPubkey)
 	hash := sha256.Sum256(digest)
-	assert.Equal(t, [32]uint8(refHashBytes), hash)
+	assert.Equal(t, refHashBytes, hash[:])
 }
 
 func TestValidateSECP256R1SignaturePreset(t *testing.T) {
