@@ -36,7 +36,7 @@ func ValidateSignature(hexMessage string, hexSignature string, hexPublicKey stri
 // ValidateSECP256R1Signature takes the hex-encoded message together with r, s of the signature (combined as []byte{r.Bytes()..., s.Bytes()...})
 // and x, y (combined as []byte{0x04, x.Bytes()..., y.Bytes()...}) of the public key
 func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
-	_, signatureBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
+	messageBytes, sigBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
 	if err != nil {
 		return false, err
 	}
@@ -46,11 +46,15 @@ func ValidateSECP256R1Signature(hexMessage string, hexSignature string, hexPubli
 		return false, err
 	}
 
-	rBytes, sBytes := signatureBytes[:len(signatureBytes)/2], signatureBytes[len(signatureBytes)/2:]
-	r, s := new(big.Int).SetBytes(rBytes), new(big.Int).SetBytes(sBytes)
+	// Assuming asn1Data contains an ECDSA signature in DER format
+	var signature ECDSASignature
+	_, err = asn1.Unmarshal(sigBytes, &signature)
+	if err != nil {
+		return false, errors.New("unable to unmarshal signature")
+	}
 
-	hash := sha256.Sum256([]byte(hexMessage))
-	isValid := ecdsa.Verify(pubKey, hash[:], r, s)
+	hash := sha256.Sum256(messageBytes)
+	isValid := ecdsa.Verify(pubKey, hash[:], signature.R, signature.S)
 	if !isValid {
 		return false, errors.New("invalid signature")
 	}
@@ -107,30 +111,4 @@ func decodeInputs(hexMessage string, hexSignature string, hexPublicKey string) (
 		return nil, nil, nil, errors.New("invalid public key hex string")
 	}
 	return
-}
-
-func ValidateSECP256R1SignatureNew(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
-	messageBytes, sigBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
-	if err != nil {
-		return false, err
-	}
-
-	pubKey, err := UncompressedBytesToPublicKey(publicKeyBytes)
-	if err != nil {
-		return false, err
-	}
-
-	// Assuming asn1Data contains an ECDSA signature in DER format
-	var signature ECDSASignature
-	_, err = asn1.Unmarshal(sigBytes, &signature)
-	if err != nil {
-		return false, errors.New("unable to unmarshal signature")
-	}
-
-	hash := sha256.Sum256(messageBytes)
-	isValid := ecdsa.Verify(pubKey, hash[:], signature.R, signature.S)
-	if !isValid {
-		return false, errors.New("invalid signature")
-	}
-	return isValid, nil
 }
