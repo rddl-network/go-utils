@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/asn1"
 	"encoding/hex"
 	"fmt"
 	"math/big"
@@ -49,20 +50,26 @@ func TestValidateSECP256R1Signature(t *testing.T) {
 
 	pubKey := prvKey.PublicKey
 
-	digest := []byte(publicKeyString)
+	// Convert the message, signature, and public key from hex to bytes
+	publicKeyBytes, err := hex.DecodeString(publicKeyString)
+	assert.NoError(t, err)
+
+	digest := publicKeyBytes
 	hash := sha256.Sum256(digest)
 	r, s, err := ecdsa.Sign(rand.Reader, prvKey, hash[:])
 	assert.NoError(t, err)
 
-	var signBytes []byte
-	signBytes = append(signBytes, r.Bytes()...)
-	signBytes = append(signBytes, s.Bytes()...)
+	sig := signature.ECDSASignature{R: r, S: s}
+
+	// Encode the struct to ASN.1 DER format
+	asn1Bytes, err := asn1.Marshal(sig)
+	assert.NoError(t, err)
 
 	//hexDigest := hex.EncodeToString(digest)
-	hexSign := hex.EncodeToString(signBytes)
+	hexSign := hex.EncodeToString(asn1Bytes)
 	hexPubKey := hex.EncodeToString(signature.PublicKeyToUncompressedBytes(&pubKey))
 
-	isValid, err := signature.ValidateSECP256R1Signature(publicKeyString, hexSign, hexPubKey)
+	isValid, err := signature.ValidateSECP256R1SignatureNew(publicKeyString, hexSign, hexPubKey)
 	assert.NoError(t, err)
 	assert.True(t, isValid)
 
@@ -105,8 +112,8 @@ func TestHashingOfPubKey(t *testing.T) {
 }
 
 func TestValidateSECP256R1SignaturePreset(t *testing.T) {
-	ref_pubkey := "80a0b8808ec5b932c917201a26afc16899e400d86804a3171665e539c2384d0f8d0eb2dc74c2ba4ca52c53b2b6e331cac95c4432054a320314225dd6b03433fa"
-	ref_signature_asn1 := "30450221009b71d5cab046339436430a18de039fe14eca053a7c13bc7de302be767ea3b836022041aa5097ed5732832d04b47a58687cb81a6b218a9e984886dbbfee283889a9f3"
+	ref_pubkey := "66ea9383bb65c6e70ccfd3e920f426d4b3f6862fd8098e5f92cbf6ebdb360903f70933548f3345f4e8eb9bb7afb367575ac4e8e9c8a0b44b0f8480a1b344fb88"
+	ref_signature_asn1 := "3045022100affece81a6f53445dc2b61719f1f23ab4c53191f9562b13aa95d612a9ed8816d02201a5af2cceaae4364dce5acbb9b9869a6728a228de9e96043a0b240f6e6a86a0a"
 
 	isValid, err := signature.ValidateSECP256R1SignatureNew(ref_pubkey, ref_signature_asn1, ref_pubkey)
 	assert.NoError(t, err)

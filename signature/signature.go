@@ -12,6 +12,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 )
 
+type ECDSASignature struct {
+	R, S *big.Int
+}
+
 func ValidateSignature(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
 	messageBytes, signatureBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
 	if err != nil {
@@ -106,7 +110,7 @@ func decodeInputs(hexMessage string, hexSignature string, hexPublicKey string) (
 }
 
 func ValidateSECP256R1SignatureNew(hexMessage string, hexSignature string, hexPublicKey string) (bool, error) {
-	_, sigBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
+	messageBytes, sigBytes, publicKeyBytes, err := decodeInputs(hexMessage, hexSignature, hexPublicKey)
 	if err != nil {
 		return false, err
 	}
@@ -116,10 +120,6 @@ func ValidateSECP256R1SignatureNew(hexMessage string, hexSignature string, hexPu
 		return false, err
 	}
 
-	type ECDSASignature struct {
-		R, S *big.Int
-	}
-
 	// Assuming asn1Data contains an ECDSA signature in DER format
 	var signature ECDSASignature
 	_, err = asn1.Unmarshal(sigBytes, &signature)
@@ -127,7 +127,7 @@ func ValidateSECP256R1SignatureNew(hexMessage string, hexSignature string, hexPu
 		return false, errors.New("unable to unmarshal signature")
 	}
 
-	hash := sha256.Sum256([]byte(hexMessage))
+	hash := sha256.Sum256(messageBytes)
 	isValid := ecdsa.Verify(pubKey, hash[:], signature.R, signature.S)
 	if !isValid {
 		return false, errors.New("invalid signature")
