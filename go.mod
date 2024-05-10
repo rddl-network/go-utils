@@ -1,6 +1,6 @@
 module github.com/rddl-network/go-utils
 
-go 1.19.13
+go 1.19
 
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
