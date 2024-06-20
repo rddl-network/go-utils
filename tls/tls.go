@@ -38,3 +38,25 @@ func Get2WayTLSClient(certsPath string) (client *http.Client, err error) {
 	}
 	return
 }
+
+// Get2WayTLSServer creates a Go TLS server config for web client authentication.
+func Get2WayTLSServer(caCertFile []byte) (tlsConfig *tls.Config) {
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCertFile)
+
+	return &tls.Config{
+		ClientCAs:                caCertPool,
+		ClientAuth:               tls.RequireAndVerifyClientCert,
+		MinVersion:               tls.VersionTLS13,
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+		},
+	}
+}
