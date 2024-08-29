@@ -25,7 +25,7 @@ type AppLogger struct {
 func GetLogger(logLevel string) AppLogger {
 	var logger log.Logger
 	logger = log.NewLogfmtLogger(os.Stderr)
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.Caller(6))
 
 	// logLevel should be set to "debug", "info", "warn", or "error"
 	if !slices.Contains([]string{DEBUG, INFO, WARN, ERROR}, logLevel) {
