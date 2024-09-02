@@ -16,6 +16,7 @@ const (
 	INFO  = "info"
 	WARN  = "warn"
 	ERROR = "error"
+	DEPTH = 6 // DEPTH set to 6 so logger.Error() or similar returns the caller of said function
 )
 
 type AppLogger struct {
@@ -25,7 +26,7 @@ type AppLogger struct {
 func GetLogger(logLevel string) AppLogger {
 	var logger log.Logger
 	logger = log.NewLogfmtLogger(os.Stderr)
-	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
+	logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.Caller(DEPTH))
 
 	// logLevel should be set to "debug", "info", "warn", or "error"
 	if !slices.Contains([]string{DEBUG, INFO, WARN, ERROR}, logLevel) {
